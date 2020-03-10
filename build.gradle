@@ -25,8 +25,11 @@ repositories {
 
 
 dependencies {
+	compile group: 'com.auth0', name: 'auth0-spring-security-api', version: '1.0.0-rc.3'
+	compile("org.springframework.boot:spring-boot-starter-security")
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile("org.hsqldb:hsqldb")
+	compile("com.auth0:java-jwt:3.4.0")
 }
