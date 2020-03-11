@@ -18,9 +18,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
 
-import static com.github.git_leon.authentication.SecurityConstants.SIGN_UP_URL;
 
-
+/**
+ * to configure them on the Spring Security filter chain
+ */
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
@@ -31,10 +32,18 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+    /**
+     * a method where we can define which resources are public and which are secured.
+     * In our case, we set the SIGN_UP_URL endpoint as being public and everything else as being secured.
+     * We also configure CORS (Cross-Origin Resource Sharing) support through http.cors() and
+     * we add a custom security filter in the Spring Security filter chain
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+                .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
@@ -43,11 +52,22 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
+    /**
+     * a method where we defined a custom implementation of UserDetailsService to load user-specific data in the security framework.
+     * We have also used this method to set the encrypt method used by our application (BCryptPasswordEncoder)
+     * @param auth
+     * @throws Exception
+     */
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
+    /**
+     * a method where we can allow/restrict our CORS support.
+     * In our case we left it wide open by permitting requests from any source (/**).
+     * @return
+     */
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
